@@ -1,0 +1,14 @@
+select order_created_time_utc, 
+count(*) AS total_order,
+count(status_id='4') AS processed,
+count(status_id='5') AS cancelled,
+count(payment_method_id='2') AS bank_transfer,
+count(payment_method_id='3') AS others,
+count(delivery_province="Jawa Tengah"),
+sum(points_used),
+max(discount),
+avg(total_cart)
+from soraya_ai_accuracy.order inner join soraya_ai_accuracy.member
+where order_created_time_utc>='2019-03-05 08:00:00' and member.is_reseller='0'
+group by order_created_time_utc
+order by order_created_time_utc asc;
