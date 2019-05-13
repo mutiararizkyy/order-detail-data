@@ -1,0 +1,20 @@
+
+SELECT od.order_public_id, 
+od.order_created_time_utc,
+m.phone_number,
+mp.city,
+mp.province,
+os.name AS Order_status,
+pm.name AS Payment_method,
+od.total_cart,
+@diskon:=od.discount+od.points_used AS Total_Discount,
+IF (od.total_cart>=250000, @gtotal:=od.total_cart-od.discount, @gtotal:=od.total_cart+od.shipping_cost-od.discount) AS Grand_Total
+FROM ((((soraya_ai_accuracy.`order` AS od
+INNER JOIN soraya_ai_accuracy.`member` AS m ON od.member_entity_id=m.entity_id)
+INNER JOIN soraya_ai_accuracy.`member_profile` AS mp ON m.profile_entity_id=mp.entity_id)
+INNER JOIN soraya_ai_accuracy.`order_status_type` AS os ON od.status_id=os.id)
+INNER JOIN soraya_ai_accuracy.`payment_method_type` AS pm ON od.payment_method_id=pm.id)
+WHERE m.is_verified=1 and
+mp.province="DKI Jakarta" or mp.province="Banten" or mp.province="Jawa barat" and
+(od.order_created_time_utc between '2019-03-10' and '2019-03-25')
+ORDER BY od.order_created_time_utc ASC, Grand_total DESC;
